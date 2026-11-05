@@ -1,4 +1,3 @@
-# AuditReach AI
 
 **Project:** Lead Generation and Outreach Agent (n8n workflow)
 
@@ -58,4 +57,4 @@ Form -> Apify Maps Scraper -> Filter (has website) -> Email Extractor (Gemini)
 
 ## Author
 
-Muhammad Daoud, AI Automation Engineer
+Muhammad Daoud, Agentic AI & Automation Engineer
