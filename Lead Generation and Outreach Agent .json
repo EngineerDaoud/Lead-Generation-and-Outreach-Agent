@@ -1,0 +1,891 @@
+{
+  "name": "Lead generation agent",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Lead Machine",
+        "formDescription": "Provide the Info Below",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Business Type",
+              "placeholder": "e.g. Plumber",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Location",
+              "placeholder": "e.g. Rome, Italy",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Lead Number",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email Style",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Friendly"
+                  },
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Simple"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "GO "
+        }
+      },
+      "id": "49a75edf-736f-4054-aea8-8a24c159f27b",
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [
+        -80,
+        592
+      ],
+      "webhookId": "2ef0c938-f117-4f6c-840a-b2dc35a615b3",
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "text": "=Website: {{ $json.website }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Email Address",
+              "description": "=find out the best only one email address from the website after scraping the website. The mail address have to be in ideal format.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "571cd0ce-4578-4e7a-8a92-647ef4662d3b",
+      "name": "Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        336,
+        736
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite-preview",
+        "options": {}
+      },
+      "id": "0d5da717-af00-429f-91aa-cf09402341e0",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        208,
+        928
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4O92jToZlBcoJ5Cy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "0906e21a-0958-433e-b400-8694915ef3c9",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.website }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f1cc441c-8138-4038-a5bf-b243f830d2ea",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        960,
+        496
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "10LvCb0mnlhjdM_rebRLehW7uzQASJWahupj5pDR4k6w",
+          "mode": "list",
+          "cachedResultName": "n8n leads sheet ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10LvCb0mnlhjdM_rebRLehW7uzQASJWahupj5pDR4k6w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10LvCb0mnlhjdM_rebRLehW7uzQASJWahupj5pDR4k6w/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company Name": "={{ $('Filter').item.json.title }}",
+            "Category": "={{ $('Filter').item.json.categoryName }}",
+            "Website": "={{ $('Filter').item.json.website }}",
+            "Phone Number": "={{ $('Filter').item.json.phone }}",
+            "Email Address": "={{ $json.output['Email Address'] }}",
+            "Address": "={{ $('Filter').item.json.address }}",
+            "Country": "={{ $('On form submission').item.json.Location }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Weak Points",
+              "displayName": "Weak Points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Improvments",
+              "displayName": "Improvments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cold Mail Status",
+              "displayName": "Cold Mail Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SEND Time",
+              "displayName": "SEND Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e3f168e5-4330-4ee7-ba4e-52df7d58f120",
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1008,
+        928
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5G9ZOoqbM9nscgJU",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "0601f2d2-2522-471e-9e11-29498a47e19a",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              },
+              "leftValue": "={{ $json.output['Email Address'] }}",
+              "rightValue": "@"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0a3d98f3-2446-4491-9e86-f97759765b4a",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        720,
+        944
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {},
+      "id": "fd369959-451a-4e86-b988-4e233a5e2904",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1024,
+        1168
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Email Address'] }}",
+        "subject": "={{ $('Information Extractor & Genrator').item.json.output['Mail Subject'] }}",
+        "emailType": "text",
+        "message": "={{ $('Information Extractor & Genrator').item.json.output['Mail Body'] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "87b79200-12c4-43a9-97c8-72727e73bf11",
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "maxTries": 2,
+      "position": [
+        1456,
+        1408
+      ],
+      "webhookId": "9ce15ceb-1aeb-4dd7-b269-f981f431c05f",
+      "executeOnce": false,
+      "retryOnFail": false,
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zAATh8OLJKKSMaOx",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "10LvCb0mnlhjdM_rebRLehW7uzQASJWahupj5pDR4k6w",
+          "mode": "list",
+          "cachedResultName": "n8n leads sheet ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10LvCb0mnlhjdM_rebRLehW7uzQASJWahupj5pDR4k6w/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10LvCb0mnlhjdM_rebRLehW7uzQASJWahupj5pDR4k6w/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email Address": "={{ $('Data Mapping').item.json['Email Address'] }}",
+            "Cold Mail Status": "Done",
+            "SEND Time": "={{ $('Data Mapping').item.json['Send Time'] }}",
+            "Weak Points": "={{ $('Weak points Analyzer').item.json.output['Weak Points'] }}",
+            "Improvments": "={{ $('Weak points Analyzer').item.json.output.Suggestions }}"
+          },
+          "matchingColumns": [
+            "Email Address"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Weak Points",
+              "displayName": "Weak Points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Improvments",
+              "displayName": "Improvments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cold Mail Status",
+              "displayName": "Cold Mail Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SEND Time",
+              "displayName": "SEND Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8b727879-86bf-411e-a0b0-7cf4e55be0e5",
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1808,
+        1472
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5G9ZOoqbM9nscgJU",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3e2a864f-9077-43a4-8b35-32a64201c03a",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -272,
+        1296
+      ],
+      "notesInFlow": false,
+      "typeVersion": 3,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "f13527f0-7873-4dd7-8c1a-c56d227fa171",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -16,
+        1312
+      ],
+      "webhookId": "a8a457d5-f88d-451c-ac51-1af17c8435b0",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        608,
+        1408
+      ],
+      "id": "332653b5-9a0b-40f8-b244-2d4a20390d97",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4O92jToZlBcoJ5Cy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/acts/compass~crawler-google-places/run-sync-get-dataset-items?token=apify_api_",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"includeWebResults\": false,\n    \"language\": \"en\",\n    \"locationQuery\": \"{{ $json.Location }}\",\n    \"maxCrawledPlacesPerSearch\": {{ $json['Lead Number'] }},\n    \"maxImages\": 0,\n    \"maximumLeadsEnrichmentRecords\": 0,\n    \"scrapeContacts\": false,\n    \"scrapeDirectories\": false,\n    \"scrapeImageAuthors\": false,\n    \"scrapePlaceDetailPage\": false,\n    \"scrapeReviewsPersonalData\": true,\n    \"scrapeTableReservationProvider\": false,\n    \"searchStringsArray\": [\n        \"{{ $json['Business Type'] }}\"\n    ],\n    \"skipClosedPlaces\": false\n}",
+        "options": {}
+      },
+      "id": "2294be1e-b7e7-437a-ba31-322bf4c7065f",
+      "name": "Apify Scraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        480,
+        304
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "text": "=You are a professional cold email writer for an AI Automation Agency.\n\nRecipient Information:\n\nCompany Name: {{ $('Loop Over Items').item.json['Company Name'] }}\nBusiness Type: {{ $('Loop Over Items').item.json.Category }}\nEmail Tone: {{ $('On form submission').item.json['Email Style'] }}\n\nWebsite Weak Points:\n{{ $json.output['Weak Points'] }}\n\nWebsite Improvement Suggestions:\n{{ $json.output['Suggestions'] }}\n\nInstructions:\n\n1. Start the email with a greeting.\n\nExample:\nHi {{ $('Loop Over Items').item.json['Company Name'] }} Team,\n\n2. Mention that while reviewing their website/business we noticed a few improvement opportunities.\n\n3. Naturally mention 1–2 weak points found on their website (for example SEO issues, missing call-to-action, slow website performance, poor lead capture, outdated design etc).\n\n4. After mentioning the weak points, briefly introduce the improvement suggestions that could help solve these issues.\n\n5. Mention the improvement suggestions naturally in the email (use the suggestions provided in the input).\n\n6. Explain that we specialize in helping businesses improve their digital presence and operations using modern technology, AI automation, and optimized websites.\n\n7. Briefly introduce our core services that can help improve their business:\n\n• Professional Website Development to create fast, modern, and conversion-focused websites\n• SEO Optimization to improve Google ranking and attract more organic traffic\n• AI Automation Systems to automate repetitive business tasks\n• AI Receptionist to answer customer inquiries 24/7\n• AI-Powered Lead Generation systems to capture more potential customers\n• Workflow Automation to streamline internal operations\n• Custom AI Agents designed specifically for business needs\n\n8. Explain briefly that these improvements help businesses:\n\n• increase online visibility\n• attract more customers\n• reduce operational costs\n• save valuable time\n• automate repetitive work\n• improve overall business efficiency\n\n9. Keep the email concise, natural, and professional.\n\n10. End the email with a soft call to action such as:\n\n\"If you'd like to learn more or explore additional improvements, feel free to contact us. We'd be happy to share a few AI automation and website improvement ideas tailored for your business.\"\n\nReturn the result in this format:\n\nMail Subject:\n{{ $('Loop Over Items').item.json['Company Name'] }} – AI quick idea\n\nMail Body:\n\nSignature:\n\nMuhammad Daoud\nAI Automation Engineer\nEmail: muhammaddaoudqadir@gmail.com\nPhone: +92 332 2522329\n",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Mail Subject",
+              "description": "Eye catchy mail Subject for the cold mail",
+              "required": true
+            },
+            {
+              "name": "Mail Body",
+              "description": "=body message of the mail, a perfect and clear cold mail.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "db871413-4d1c-4d9f-be82-f5b938baa7b1",
+      "name": "Information Extractor & Genrator",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        528,
+        1200
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ab73a5e-6659-4615-9f03-a1b3dacaa42e",
+              "name": "Send Time",
+              "type": "string",
+              "value": "={{$now.toFormat(\"MM-dd-yyyy (h:mm a)\")}}"
+            },
+            {
+              "id": "a102af99-f990-4f54-aa19-96a4c8002a9b",
+              "name": "Email Address",
+              "type": "string",
+              "value": "={{ $('Wait').item.json['Email Address'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "57178d65-593e-44c9-91f5-b2b917b0a3cc",
+      "name": "Data Mapping",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1168,
+        1408
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        1488
+      ],
+      "id": "8f8b4a20-4739-4855-bd24-c25578ad555e",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4O92jToZlBcoJ5Cy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=You are a professional website auditor and AI business automation consultant.\n\nAnalyze the following website in depth.\n\nWebsite URL:\n{{ $json.Website }}\n\nPerform a detailed audit and identify weaknesses.\n\nAnalyze the website from these perspectives:\n\n1. SEO Issues\n- Missing meta titles or descriptions\n- Poor keyword optimization\n- Weak content structure\n- Missing schema markup\n- Poor internal linking\n- Slow indexing or crawl issues\n\n2. UX / Design Problems\n- Poor navigation\n- Confusing layout\n- Slow loading pages\n- Mobile responsiveness issues\n- Weak call-to-action\n- Poor user journey\n\n3. Missing Business Elements\nCheck if the website is missing important business pages such as:\n- Testimonials or case studies\n- Clear services pages\n- Pricing page\n- Lead capture forms\n- Contact options\n- Trust signals (reviews, certifications)\n\n4. Technical Issues\n- Slow page speed\n- Core Web Vitals problems\n- Broken links\n- Missing alt text\n- Poor accessibility\n- Security or performance issues\n\n5. Market & Competitor Comparison\nAnalyze how this website might perform compared to modern competitors in the same industry.\n\nMention where the website looks outdated or less competitive.\n\n6. AI & Modern Website Trends\nEvaluate if the website is missing modern features such as:\n\n- AI chatbot or AI receptionist\n- AI lead capture system\n- Automated customer support\n- Smart personalization\n- AI-driven marketing automation\n- Conversion optimization tools\n\n7. Improvement Suggestions\nBased on the weaknesses found, suggest improvements that could help the business grow.\n\nFocus especially on:\n\n- AI automation opportunities\n- Conversion optimization\n- Better lead generation\n- Website modernization\n- SEO growth opportunities\n\nReturn the result in this format:\n\nWeak Points:\n• short bullet points explaining the problems\n\nSuggestions:\n• bullet points explaining how the website can be improved\n• include AI automation opportunities where relevant",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Weak Points",
+              "description": "List of problems found on the website",
+              "required": true
+            },
+            {
+              "name": "Suggestions",
+              "description": "Suggestions to improve the website",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        1312
+      ],
+      "id": "438384c3-aa35-4286-b7e4-542d45a9576f",
+      "name": "Weak points Analyzer"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Weak points Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Apify Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor & Genrator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apify Scraper": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor & Genrator": {
+      "main": [
+        [
+          {
+            "node": "Data Mapping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Mapping": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Weak points Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weak points Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor & Genrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ba04df44-136a-41e9-8418-698195fd080f",
+  "meta": {
+    "templateId": "7423",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7eb4dca614268b280c91686c813862b2e48321782b2a5c412986b2fa4bc8cf0e"
+  },
+  "id": "rReIWMEdqCw8Z8Rh",
+  "tags": []
+}
